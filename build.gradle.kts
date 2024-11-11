@@ -1,7 +1,7 @@
 // Project-level build.gradle.kts
 
 buildscript {
-    val kotlin_version by extra("1.8.0") // Adjust Kotlin version if necessary
+    val kotlin_version by extra("1.8.0")
 
     repositories {
         google()
@@ -9,7 +9,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:8.0.2")
+        classpath("com.android.tools.build:gradle:8.2.0")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
     }
 
