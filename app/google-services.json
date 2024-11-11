@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1003677406668",
+    "project_id": "pixtext-8df75",
+    "storage_bucket": "pixtext-8df75.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1003677406668:android:88f35f778473255178f969",
+        "android_client_info": {
+          "package_name": "uk.ac.tees.mad.S3269326"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANOR2qZuURs8PibhGaLUxKgiQRCohQCXQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

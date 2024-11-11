@@ -9,9 +9,14 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:8.0.2") // Adjust Gradle plugin version
+        classpath("com.android.tools.build:gradle:8.0.2")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
     }
+
+}
+
+plugins {
+    id("com.google.gms.google-services") version "4.4.2" apply false // Google services plugin
 }
 
 tasks.register("clean", Delete::class) {
