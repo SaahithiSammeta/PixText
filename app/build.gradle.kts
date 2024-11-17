@@ -45,6 +45,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.firebase.database.ktx)
     val kotlin_version = "1.8.0" // Ensure this matches in both files
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")

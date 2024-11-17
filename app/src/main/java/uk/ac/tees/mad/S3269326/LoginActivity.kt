@@ -43,10 +43,16 @@ class LoginActivity : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show()
-                    // Optionally, navigate to the main screen
+                    // navigate to the main screen
+                    startActivity(Intent(this, PixTextActivity::class.java))
                 } else {
                     Toast.makeText(this, "Login failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
             }
     }
+
+    override fun onBackPressed() {
+        finish()
+    }
+
 }
