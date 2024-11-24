@@ -2,6 +2,7 @@ package uk.ac.tees.mad.S3269326
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
@@ -44,7 +45,12 @@ class LoginActivity : AppCompatActivity() {
                 if (task.isSuccessful) {
                     Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show()
                     // navigate to the main screen
-                    startActivity(Intent(this, PixTextActivity::class.java))
+                    try{
+                        startActivity(Intent(this, PixTextActivity::class.java))
+                    }catch (e:Exception){
+                        Log.e("LoginActivity", "Navigation error", e)
+                        Toast.makeText(this, "Error navigating to PixTextActivity", Toast.LENGTH_SHORT).show()
+                    }
                 } else {
                     Toast.makeText(this, "Login failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
