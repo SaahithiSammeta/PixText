@@ -111,5 +111,6 @@ class PixTextActivity : AppCompatActivity() {
     override fun onBackPressed() {
         super.onBackPressed()
         mAuth.signOut()
+        finishAffinity()
     }
 }

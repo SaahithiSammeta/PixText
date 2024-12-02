@@ -4,32 +4,27 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="8dp">
 
-    <!-- Sender's name -->
-    <TextView
-        android:id="@+id/textViewSender"
+    <!-- Toolbar to show the sender's name -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:textColor="@color/black"
-        android:paddingBottom="8dp" />
+        android:background="?attr/colorPrimary"
+        android:titleTextColor="@android:color/white"
+        android:title="Sender's Name"
+        android:elevation="4dp" />
 
-    <!-- Message timeline -->
-    <ScrollView
+    <!-- RecyclerView for chat messages -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewChat"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
-        <TextView
-            android:id="@+id/textViewMessages"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:textColor="@color/black" />
-    </ScrollView>
+        android:layout_weight="1"
+        android:paddingBottom="10dp" />
 
-    <!-- Reply input field and send button -->
+    <!-- Reply text field and send button -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -39,11 +34,9 @@
         <EditText
             android:id="@+id/editTextReply"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:hint="Type your message"
-            android:padding="8dp"
-            android:background="@android:drawable/edit_text"
+            android:layout_weight="1"
+            android:hint="Type a message"
             android:inputType="text" />
 
         <Button
@@ -52,4 +45,5 @@
             android:layout_height="wrap_content"
             android:text="Send" />
     </LinearLayout>
+
 </LinearLayout>

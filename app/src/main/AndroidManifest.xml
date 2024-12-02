@@ -16,7 +16,7 @@
         android:theme="@style/Theme.PixText"
         tools:targetApi="31">
         <activity
-            android:name=".SignUpActivity"
+            android:name=".LoginActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.PixText">
@@ -25,7 +25,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LoginActivity" />
+        <activity android:name=".SignUpActivity" />
         <activity android:name=".PixTextActivity" />
         <activity android:name=".NewMessageActivity" />
         <activity android:name=".ViewMessageActivity" />

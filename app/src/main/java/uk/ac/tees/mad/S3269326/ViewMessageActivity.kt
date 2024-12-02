@@ -1,136 +1,121 @@
 package uk.ac.tees.mad.S3269326
 
 import android.os.Bundle
-import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import uk.ac.tees.mad.S3269326.databinding.ActivityViewMessageBinding
 
 class ViewMessageActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityViewMessageBinding
-    private lateinit var senderTextView: TextView
-    private lateinit var messageTextView: TextView
-    private lateinit var replyEditText: EditText
-    private lateinit var sendButton: Button
-
+    private lateinit var adapter: ChatAdapter
+    private val messages: MutableList<MessageData> = mutableListOf()
     private val mAuth = FirebaseAuth.getInstance()
+    private val currentUser = mAuth.currentUser?.email
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityViewMessageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // UI components
-        senderTextView = binding.textViewSender
-        messageTextView = binding.textViewMessages
-        replyEditText = binding.editTextReply
-        sendButton = binding.buttonSendReply
+        val sender = intent.getStringExtra("sender")
+        if (sender == null || currentUser == null) {
+            Toast.makeText(this, "Invalid sender or user!", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
 
-        // Retrieve the sender name from the Intent
-        val sender = intent.getStringExtra("sender") ?: "Unknown Sender"
-        senderTextView.text = "Messages from $sender"
+        // Set up the Toolbar
+        val toolbar = binding.toolbar
+        setSupportActionBar(toolbar)
+        supportActionBar?.apply {
+            title = sender // Set the sender's name as the title
+            setDisplayHomeAsUpEnabled(true) // Optional: to add a back button
+        }
+        // Enable the back button in the action bar
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        // Fetch messages from Firebase based on the sender
+        // Set up RecyclerView
+        adapter = ChatAdapter(messages, currentUser)
+        binding.recyclerViewChat.apply {
+            layoutManager = LinearLayoutManager(this@ViewMessageActivity).apply { stackFromEnd = true }
+            adapter = this@ViewMessageActivity.adapter
+        }
+
+        // Fetch chat messages
         fetchMessages(sender)
 
-        // Handle Send button click
-        sendButton.setOnClickListener {
-            val replyText = replyEditText.text.toString().trim()
+        // Set up Send button
+        binding.buttonSendReply.setOnClickListener {
+            val replyText = binding.editTextReply.text.toString().trim()
             if (replyText.isNotEmpty()) {
                 sendMessage(sender, replyText)
-                replyEditText.text.clear() // Clear the input field
+                binding.editTextReply.text.clear()
             } else {
                 Toast.makeText(this, "Message cannot be empty", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    /**
-     * Fetches messages from Firebase for the given sender.
-     */
     private fun fetchMessages(sender: String) {
-        // Create a reference to the messages in Firebase
-        val messagesRef = FirebaseDatabase.getInstance().getReference("messages")
+        val dbRef = FirebaseDatabase.getInstance().getReference("messages")
 
-        // Query to get all messages sent by the sender
-        messagesRef.orderByChild("sender").equalTo(sender)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    // Retrieve messages and display them
-                    val messages = mutableListOf<MessageData>()
-                    snapshot.children.forEach { data ->
-                        val message = data.getValue(MessageData::class.java)
-                        if (message != null) {
+        dbRef.addValueEventListener(object : com.google.firebase.database.ValueEventListener {
+            override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
+                messages.clear()
+                for (child in snapshot.children) {
+                    val message = child.getValue(MessageData::class.java)
+                    if (message != null) {
+                        // Check if the message belongs to this chat
+                        if ((message.sender == sender && message.receiver == currentUser) ||
+                            (message.sender == currentUser && message.receiver == sender)
+                        ) {
                             messages.add(message)
                         }
                     }
-                    displayMessages(messages)
                 }
+                messages.sortBy { it.timestamp }
+                adapter.notifyDataSetChanged()
+                binding.recyclerViewChat.scrollToPosition(messages.size - 1)
+            }
 
-                override fun onCancelled(error: DatabaseError) {
-                    Toast.makeText(this@ViewMessageActivity, "Error loading messages", Toast.LENGTH_SHORT).show()
-                }
-            })
+            override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
+                Toast.makeText(this@ViewMessageActivity, "Failed to fetch messages", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
-    /**
-     * Displays messages in the TextView.
-     */
-    private fun displayMessages(messages: List<MessageData>) {
-        if (messages.isNotEmpty()) {
-            val timeline = buildMessageTimeline(messages)
-            messageTextView.text = timeline
-        } else {
-            messageTextView.text = "No messages found."
-        }
-    }
-
-    /**
-     * Constructs a formatted message timeline.
-     */
-    private fun buildMessageTimeline(messages: List<MessageData>): String {
-        val timelineBuilder = StringBuilder()
-        for (message in messages.sortedBy { it.timestamp }) {
-            timelineBuilder.append("${message.timestampFormatted}\n")
-            timelineBuilder.append("${message.message}\n\n")
-        }
-        return timelineBuilder.toString().trim()
-    }
-
-    /**
-     * Sends a reply message to the sender using Firebase.
-     */
     private fun sendMessage(receiver: String, messageContent: String) {
-        val currentUser = mAuth.currentUser ?: return
-        val sender = currentUser.email ?: return
+        val dbRef = FirebaseDatabase.getInstance().getReference("messages")
 
-        // Prepare message data
-        val messageData = mapOf(
-            "sender" to sender,
-            "receiver" to receiver,
-            "message" to messageContent,
-            "timestamp" to System.currentTimeMillis()
+        val message = MessageData(
+            sender = currentUser ?: return,
+            receiver = receiver,
+            message = messageContent,
+            timestamp = System.currentTimeMillis()
         )
 
-        // Push message to Firebase
-        FirebaseDatabase.getInstance().getReference("messages").push()
-            .setValue(messageData)
+        dbRef.push()
+            .setValue(message)
             .addOnSuccessListener {
                 Toast.makeText(this, "Message sent", Toast.LENGTH_SHORT).show()
-                // Optionally fetch updated messages
-                fetchMessages(receiver)
+                fetchMessages(receiver) // Refresh messages to include the new one
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Failed to send message", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    // Handle back button press
+    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
+        return if (item.itemId == android.R.id.home) {
+            onBackPressed()
+            true
+        } else {
+            super.onOptionsItemSelected(item)
+        }
     }
 }
