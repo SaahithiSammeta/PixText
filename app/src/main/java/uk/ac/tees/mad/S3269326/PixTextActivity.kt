@@ -21,10 +21,10 @@ import uk.ac.tees.mad.S3269326.databinding.ActivityPixtextBinding
 class PixTextActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPixtextBinding
-    val mAuth = FirebaseAuth.getInstance()
-    var listView: ListView? = null
-    var emails: ArrayList<String> = ArrayList()
-    var messages: ArrayList<DataSnapshot> = ArrayList()
+    private val mAuth = FirebaseAuth.getInstance()
+    private var listView: ListView? = null
+    private val uniqueSenders: MutableSet<String> = mutableSetOf() // Ensure unique senders
+    private val senderMessages: MutableMap<String, MutableList<DataSnapshot>> = mutableMapOf() // Map sender to their messages
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,64 +37,73 @@ class PixTextActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.title = "PixText App"
 
-        listView = binding.messageListView;
-        val adapter = ArrayAdapter(this,android.R.layout.simple_list_item_1,emails)
+        listView = binding.messageListView
+        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, ArrayList(uniqueSenders))
         listView?.adapter = adapter
 
-        Firebase.database.getReference().child("users").child(mAuth.currentUser?.uid?:"")
-            .child("snaps").addChildEventListener(object:
-                ChildEventListener {
-                override fun onChildAdded(p0: DataSnapshot, previousChildName: String?) {
-                    emails.add(p0.child("from").value as String)
-                    messages.add(p0)
-                    adapter.notifyDataSetChanged()
-                }
-                override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                }
-                override fun onChildRemoved(p0: DataSnapshot) {
-                    var index = 0
-                    for (snap: DataSnapshot in messages) {
-                        if (snap.key == p0.key) {
-                            messages.removeAt(index)
-                            emails.removeAt(index)
+        // Listen for messages where the current user is the receiver
+        Firebase.database.getReference("messages")
+            .orderByChild("receiver")
+            .equalTo(mAuth.currentUser?.email)
+            .addChildEventListener(object : ChildEventListener {
+                override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                    val sender = snapshot.child("sender").getValue(String::class.java)
+                    if (sender != null) {
+                        if (!uniqueSenders.contains(sender)) {
+                            uniqueSenders.add(sender)
+                            senderMessages[sender] = mutableListOf()
                         }
-                        index++
+                        senderMessages[sender]?.add(snapshot) // Add the message to the sender's list
+                        adapter.clear()
+                        adapter.addAll(uniqueSenders)
+                        adapter.notifyDataSetChanged()
                     }
-                    adapter.notifyDataSetChanged()
                 }
-                override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+
+                override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
+                override fun onChildRemoved(snapshot: DataSnapshot) {
+                    val sender = snapshot.child("sender").getValue(String::class.java)
+                    if (sender != null && senderMessages.containsKey(sender)) {
+                        senderMessages[sender]?.remove(snapshot)
+                        if (senderMessages[sender]?.isEmpty() == true) {
+                            uniqueSenders.remove(sender)
+                            senderMessages.remove(sender)
+                        }
+                        adapter.clear()
+                        adapter.addAll(uniqueSenders)
+                        adapter.notifyDataSetChanged()
+                    }
                 }
-                override fun onCancelled(error: DatabaseError) {
-                }
+
+                override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+                override fun onCancelled(error: DatabaseError) {}
             })
-        listView?.onItemClickListener = AdapterView.OnItemClickListener { adapterView, view, i, l ->
-            val snapshot = messages.get(i)
 
-            var intent = Intent(this, ViewMessageActivity::class.java)
-
-            intent.putExtra("imageName",snapshot.child("imageName").value as String)
-            intent.putExtra("imageURL",snapshot.child("imageURL").value as String)
-            intent.putExtra("message",snapshot.child("message").value as String)
-            intent.putExtra("snapKey",snapshot.key)
-
+        // Navigate to ViewMessageActivity on list item click
+        listView?.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
+            val sender = adapter.getItem(position)
+            val intent = Intent(this, ViewMessageActivity::class.java)
+            intent.putExtra("sender", sender) // Pass the sender name
             startActivity(intent)
         }
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater = menuInflater
-        inflater.inflate(R.menu.menulist,menu)
+        inflater.inflate(R.menu.menulist, menu)
         return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item?.itemId == R.id.createMessage) {
-            val intent = Intent(this, NewMessageActivity::class.java)
-            startActivity(intent)
-        } else if (item?.itemId == R.id.logout){
-            mAuth.signOut()
-            finish()
+        when (item.itemId) {
+            R.id.createMessage -> {
+                val intent = Intent(this, NewMessageActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.logout -> {
+                mAuth.signOut()
+                finish()
+            }
         }
         return super.onOptionsItemSelected(item)
     }
