@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">PixText</string>
+    <string name="mapbox_access_token">pk.eyJ1Ijoic2FhaGl0aGktc2FhaGkyIiwiYSI6ImNtNGc1NTlvajFkYmYycXNhdmR5MG9jNGkifQ.6MMjGeYrlD9mWnih7f4YMA</string>
 </resources>

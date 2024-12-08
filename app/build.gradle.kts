@@ -1,9 +1,8 @@
-// App-level build.gradle.kts
-
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
+    id("kotlin-parcelize") // Add this plugin for @Parcelize support
 }
 
 android {
@@ -42,11 +41,21 @@ android {
     viewBinding {
         enable = true
     }
+
+    packagingOptions {
+        // Ignore duplicate META-INF files to avoid conflicts
+        exclude("META-INF/DEPENDENCIES")
+        exclude("META-INF/LICENSE")
+        exclude("META-INF/LICENSE.txt")
+        exclude("META-INF/NOTICE")
+        exclude("META-INF/NOTICE.txt")
+    }
 }
 
 dependencies {
     implementation(libs.firebase.database.ktx)
     implementation(libs.firebase.storage.ktx)
+    implementation(libs.play.services.location)
     val kotlin_version = "1.8.0" // Ensure this matches in both files
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")
@@ -56,4 +65,11 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.google.firebase:firebase-auth:22.1.1") // Firebase Auth SDK
     implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
+    implementation("com.amazonaws:aws-android-sdk-s3:2.16.12")
+
+    implementation("com.github.bumptech.glide:glide:4.12.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
+    implementation ("com.mapbox.maps:android:11.8.1")
+    implementation ("com.mapbox.extension:maps-compose:11.8.1")
+
 }

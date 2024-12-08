@@ -4,6 +4,13 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <meta-data
+        android:name="com.mapbox.android.SDK_ACCESS_TOKEN"
+        android:value="pk.eyJ1Ijoic2FhaGl0aGktc2FhaGkyIiwiYSI6ImNtNGc1NTlvajFkYmYycXNhdmR5MG9jNGkifQ.6MMjGeYrlD9mWnih7f4YMA" />
 
     <application
         android:allowBackup="true"
@@ -16,7 +23,7 @@
         android:theme="@style/Theme.PixText"
         tools:targetApi="31">
         <activity
-            android:name=".SignUpActivity"
+            android:name=".LoginActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.PixText">
@@ -25,7 +32,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LoginActivity" />
+        <activity android:name=".SignUpActivity" />
         <activity android:name=".PixTextActivity" />
         <activity android:name=".NewMessageActivity" />
         <activity android:name=".ViewMessageActivity" />
