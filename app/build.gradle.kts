@@ -41,6 +41,15 @@ android {
     viewBinding {
         enable = true
     }
+
+    packagingOptions {
+        // Ignore duplicate META-INF files to avoid conflicts
+        exclude("META-INF/DEPENDENCIES")
+        exclude("META-INF/LICENSE")
+        exclude("META-INF/LICENSE.txt")
+        exclude("META-INF/NOTICE")
+        exclude("META-INF/NOTICE.txt")
+    }
 }
 
 dependencies {
@@ -55,4 +64,9 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.google.firebase:firebase-auth:22.1.1") // Firebase Auth SDK
     implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
+    implementation("com.amazonaws:aws-android-sdk-s3:2.16.12")
+
+    implementation("com.github.bumptech.glide:glide:4.12.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
+
 }

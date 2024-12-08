@@ -4,10 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ListView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.google.firebase.auth.FirebaseAuth
@@ -100,6 +100,14 @@ class PixTextActivity : AppCompatActivity() {
                 val intent = Intent(this, NewMessageActivity::class.java)
                 startActivity(intent)
             }
+            R.id.myProfile -> {
+                // Open profile fragment
+                hideListView()
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, ProfileFragment())
+                    .addToBackStack(null)
+                    .commit()
+                return true            }
             R.id.logout -> {
                 mAuth.signOut()
                 finish()
@@ -108,9 +116,25 @@ class PixTextActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    private fun showListView() {
+        findViewById<ListView>(R.id.messageListView).visibility = View.VISIBLE
+        findViewById<View>(R.id.fragment_container).visibility = View.GONE
+    }
+
+    private fun hideListView() {
+        findViewById<ListView>(R.id.messageListView).visibility = View.GONE
+        findViewById<View>(R.id.fragment_container).visibility = View.VISIBLE
+    }
+
     override fun onBackPressed() {
-        super.onBackPressed()
-        mAuth.signOut()
-        finishAffinity()
+        // Check if there are fragments in the back stack
+        if (supportFragmentManager.backStackEntryCount > 0) {
+            supportFragmentManager.popBackStack()
+            showListView() // Restore ListView visibility
+        } else {
+            super.onBackPressed()
+            mAuth.signOut()
+            finishAffinity()
+        }
     }
 }

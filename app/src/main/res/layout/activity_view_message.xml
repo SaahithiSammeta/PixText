@@ -12,8 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
-        android:titleTextColor="@android:color/white"
         android:title="Sender's Name"
+        android:titleTextColor="@android:color/white"
         android:elevation="4dp" />
 
     <!-- RecyclerView for chat messages -->
