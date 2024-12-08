@@ -3,7 +3,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="70dp">
-
     <!-- Profile Image -->
     <ImageView
         android:id="@+id/profileImageView"
@@ -16,7 +15,26 @@
         android:scaleType="centerCrop"
         android:background="@drawable/circular_background" />
 
-    <!-- Username -->
+    <!-- Upload Button -->
+    <Button
+        android:id="@+id/buttonUploadProfilePic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Upload Profile Picture"
+        android:layout_gravity="center"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Username Label -->
+    <TextView
+        android:id="@+id/textUsernameLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Username:"
+        android:textSize="20sp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Username Text -->
     <TextView
         android:id="@+id/textUsername"
         android:layout_width="wrap_content"
@@ -24,13 +42,20 @@
         android:text="Username"
         android:textSize="18sp"
         android:layout_gravity="center"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="16dp" />
 
-    <!-- Upload Button -->
+    <!-- Set Location Button -->
     <Button
-        android:id="@+id/buttonUploadProfilePic"
+        android:id="@+id/buttonSetLocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Upload Profile Picture"
-        android:layout_gravity="center"/>
+        android:text="Set Location"
+        android:layout_gravity="center"
+        android:layout_marginTop="8dp" />
+
+    <!-- MapView -->
+    <com.mapbox.maps.MapView
+        android:id="@+id/mapView"
+        android:layout_width="match_parent"
+        android:layout_height="300dp" />
 </LinearLayout>

@@ -55,6 +55,7 @@ android {
 dependencies {
     implementation(libs.firebase.database.ktx)
     implementation(libs.firebase.storage.ktx)
+    implementation(libs.play.services.location)
     val kotlin_version = "1.8.0" // Ensure this matches in both files
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")
@@ -68,5 +69,7 @@ dependencies {
 
     implementation("com.github.bumptech.glide:glide:4.12.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
+    implementation ("com.mapbox.maps:android:11.8.1")
+    implementation ("com.mapbox.extension:maps-compose:11.8.1")
 
 }
